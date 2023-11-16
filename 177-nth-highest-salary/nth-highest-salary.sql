@@ -2,10 +2,13 @@ CREATE OR REPLACE FUNCTION NthHighestSalary(N INT) RETURNS TABLE (Salary INT) AS
 BEGIN
   RETURN QUERY (
     -- Write your PostgreSQL query statement below.
-    select distinct e.Salary
+    with cte as (
+    select distinct e.Salary as Salary_, dense_rank() over(order by e.Salary desc) s
     from Employee e
-    order by e.Salary desc
-    limit 1 offset N-1
+    )
+    select Salary_
+    from cte
+    where s = N
   );
 END;
 $$ LANGUAGE plpgsql;
